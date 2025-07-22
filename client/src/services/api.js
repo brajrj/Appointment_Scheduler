@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'https://appointment-schedulerss.onrender.com/';
 
 // Create axios instance
 const api = axios.create({

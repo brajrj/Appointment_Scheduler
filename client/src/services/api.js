@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://appointment-scheduler-dwrj.onrender.com';
-
+// Use env variable for production/local toggle
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // Create axios instance
 const api = axios.create({
@@ -11,7 +11,7 @@ const api = axios.create({
   },
 });
 
-// Helper function to safely get token
+// Helper to get token from localStorage
 const getToken = () => {
   if (typeof window !== 'undefined' && window.localStorage) {
     return localStorage.getItem('token');
@@ -19,14 +19,14 @@ const getToken = () => {
   return null;
 };
 
-// Helper function to safely remove token
+// Helper to remove token from localStorage
 const removeToken = () => {
   if (typeof window !== 'undefined' && window.localStorage) {
     localStorage.removeItem('token');
   }
 };
 
-// Request interceptor to add auth token
+// Interceptor — Attach token on every request
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
@@ -35,12 +35,10 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle errors
+// Interceptor — Handle Unauthorized globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -54,7 +52,7 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API
+// ==== Auth API ====
 export const authApi = {
   login: (email, password) => api.post('/auth/login', { email, password }),
   register: (userData) => api.post('/auth/register', userData),
@@ -65,18 +63,19 @@ export const authApi = {
   refreshToken: () => api.post('/auth/refresh'),
 };
 
-// User API
+// ==== User API ====
 export const userApi = {
   getProfile: () => api.get('/users/profile'),
   updateProfile: (userData) => api.put('/users/profile', userData),
-  uploadProfileImage: (formData) => api.post('/users/profile/upload-image', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
+  uploadProfileImage: (formData) =>
+    api.post('/users/profile/upload-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
   getUsers: (params) => api.get('/users', { params }),
   deleteUser: (id) => api.delete(`/users/${id}`),
 };
 
-// Appointment API
+// ==== Appointment API ====
 export const appointmentApi = {
   getAppointments: (params) => api.get('/appointments', { params }),
   getMyAppointments: (params) => api.get('/appointments/my-appointments', { params }),
@@ -84,10 +83,11 @@ export const appointmentApi = {
   createAppointment: (appointmentData) => api.post('/appointments', appointmentData),
   updateAppointment: (id, appointmentData) => api.put(`/appointments/${id}`, appointmentData),
   deleteAppointment: (id) => api.delete(`/appointments/${id}`),
-  getAvailability: (providerId, params) => api.get(`/appointments/availability/${providerId}`, { params }),
+  getAvailability: (providerId, params) =>
+    api.get(`/appointments/availability/${providerId}`, { params }),
 };
 
-// Service API
+// ==== Service API ====
 export const serviceApi = {
   getServices: (params) => api.get('/services', { params }),
   getService: (id) => api.get(`/services/${id}`),
@@ -96,7 +96,7 @@ export const serviceApi = {
   deleteService: (id) => api.delete(`/services/${id}`),
 };
 
-// Business API
+// ==== Business API ====
 export const businessApi = {
   getBusinessProfile: () => api.get('/business/profile'),
   createBusinessProfile: (profileData) => api.post('/business/profile', profileData),
@@ -105,7 +105,7 @@ export const businessApi = {
   getBusiness: (id) => api.get(`/business/${id}`),
 };
 
-// Notification API
+// ==== Notification API ====
 export const notificationApi = {
   getNotifications: (params) => api.get('/notifications', { params }),
   markAsRead: (id) => api.put(`/notifications/${id}/read`),
@@ -113,7 +113,7 @@ export const notificationApi = {
   deleteNotification: (id) => api.delete(`/notifications/${id}`),
 };
 
-// Calendar API
+// ==== Calendar API ====
 export const calendarApi = {
   getCalendarEvents: (params) => api.get('/calendar/events', { params }),
   createCalendarEvent: (eventData) => api.post('/calendar/events', eventData),

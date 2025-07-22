@@ -6,7 +6,7 @@ const { businessOwnerAuth } = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Get business profile
+// get business profile
 router.get('/profile', businessOwnerAuth, async (req, res) => {
   try {
     const businessProfile = await prisma.businessProfile.findUnique({
@@ -80,7 +80,7 @@ router.post('/profile', businessOwnerAuth, [
   }
 });
 
-// Get all businesses
+// get all businesses
 router.get('/', async (req, res) => {
   try {
     const businesses = await prisma.businessProfile.findMany({
@@ -96,7 +96,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get a specific business
+// get a specific business
 router.get('/:id', async (req, res) => {
   try {
     const businessProfile = await prisma.businessProfile.findUnique({

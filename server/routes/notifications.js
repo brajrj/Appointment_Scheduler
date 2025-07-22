@@ -12,7 +12,7 @@ const {
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Get user notifications
+// get user notifications
 router.get('/', auth, async (req, res) => {
   try {
     const { limit = 10, offset = 0 } = req.query;
@@ -30,7 +30,6 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Get unread notification count
 router.get('/unread-count', auth, async (req, res) => {
   try {
     const count = await getUnreadNotificationCount(req.user.userId);

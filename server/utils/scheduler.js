@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 // Check upcoming appointments and send reminders
 const scheduleNotifications = () => {
-  cron.schedule('0 8 * * *', async () => { // Every day at 8 am
+  cron.schedule('0 8 * * *', async () => { 
     try {
       const tomorrow = moment().add(1, 'days').startOf('day');
       const dayAfterTomorrow = moment().add(2, 'days').startOf('day');
@@ -50,7 +50,8 @@ const scheduleNotifications = () => {
     }
   }, {
     scheduled: true,
-    timezone: "Asia/Kolkata", // Replace 'Your/Timezone' with your actual timezone
+    timezone: "Asia/Kolkata",
+
   });
 };
 

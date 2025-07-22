@@ -26,7 +26,7 @@ router.post('/register', [
 
     const { email, password, firstName, lastName, phone, role = 'USER' } = req.body;
 
-    // Check if user already exists
+    // Check if user are already exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
@@ -35,11 +35,11 @@ router.post('/register', [
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash password
+    // hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
+    // create user
     const user = await prisma.user.create({
       data: {
         email,
@@ -51,7 +51,7 @@ router.post('/register', [
       }
     });
 
-    // Generate JWT
+    // generate jwt
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
@@ -88,7 +88,7 @@ router.post('/register', [
   }
 });
 
-// Login
+// login page
 router.post('/login', [
   body('email').isEmail().normalizeEmail(),
   body('password').notEmpty()
@@ -113,7 +113,6 @@ router.post('/login', [
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -146,7 +145,7 @@ router.post('/login', [
   }
 });
 
-// Get current user
+// get current user
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -183,7 +182,7 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
-// Refresh token
+// refresh token
 router.post('/refresh', auth, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -234,13 +233,11 @@ router.post('/change-password', [
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Current password is incorrect' });
     }
 
-    // Hash new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 

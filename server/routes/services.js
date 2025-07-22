@@ -6,7 +6,7 @@ const { auth, businessOwnerAuth } = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Get all services
+// get all services
 router.get('/', async (req, res) => {
   try {
     const { businessId, isActive } = req.query;
@@ -43,7 +43,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get service by ID
+// get service by ID
 router.get('/:id', async (req, res) => {
   try {
     const service = await prisma.service.findUnique({
@@ -75,7 +75,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create service
+// create service
 router.post('/', [
   businessOwnerAuth,
   body('name').notEmpty().trim(),
@@ -134,7 +134,7 @@ router.post('/', [
   }
 });
 
-// Update service
+// update service
 router.put('/:id', [
   businessOwnerAuth,
   body('name').optional().notEmpty().trim(),
@@ -203,10 +203,9 @@ router.put('/:id', [
   }
 });
 
-// Delete service
+// delete service
 router.delete('/:id', businessOwnerAuth, async (req, res) => {
   try {
-    // Check if service exists and belongs to the authenticated user
     const service = await prisma.service.findUnique({
       where: { id: req.params.id },
       include: {

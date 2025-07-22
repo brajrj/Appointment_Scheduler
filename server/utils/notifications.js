@@ -45,7 +45,7 @@ const markNotificationAsRead = async (notificationId, userId) => {
     const notification = await prisma.notification.update({
       where: {
         id: notificationId,
-        userId, // Ensure user owns this notification
+        userId, 
       },
       data: {
         isRead: true,

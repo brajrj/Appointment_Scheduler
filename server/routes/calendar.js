@@ -100,19 +100,16 @@ router.get('/availability/:providerId', auth, async (req, res) => {
       return res.status(404).json({ message: 'Provider not found' });
     }
 
-    // Get service duration
     const service = serviceId ? await prisma.service.findUnique({
       where: { id: serviceId }
     }) : null;
 
     const serviceDuration = service ? service.duration : 60; // Default 60 minutes
 
-    // Parse working hours
     const workingHours = provider.businessProfile.workingHours ? 
       JSON.parse(provider.businessProfile.workingHours) : 
       getDefaultWorkingHours();
 
-    // Get day of week for the requested date
     const dayOfWeek = moment(date).format('dddd').toLowerCase();
     const daySchedule = workingHours[dayOfWeek];
 
@@ -120,7 +117,6 @@ router.get('/availability/:providerId', auth, async (req, res) => {
       return res.json({ availableSlots: [] });
     }
 
-    // Get existing appointments for the date
     const startOfDay = moment(date).startOf('day').toDate();
     const endOfDay = moment(date).endOf('day').toDate();
 
@@ -137,7 +133,6 @@ router.get('/availability/:providerId', auth, async (req, res) => {
       }
     });
 
-    // Generate available time slots
     const availableSlots = generateTimeSlots(
       date,
       daySchedule.start,
@@ -153,7 +148,7 @@ router.get('/availability/:providerId', auth, async (req, res) => {
   }
 });
 
-// Helper function to get default working hours
+// helper function to get default working hours
 function getDefaultWorkingHours() {
   return {
     monday: { start: '09:00', end: '17:00', isOpen: true },
@@ -166,7 +161,7 @@ function getDefaultWorkingHours() {
   };
 }
 
-// Helper function to generate time slots
+// helper function to generate time slots
 function generateTimeSlots(date, startTime, endTime, duration, existingAppointments) {
   const slots = [];
   const start = moment(`${date} ${startTime}`);
@@ -178,7 +173,6 @@ function generateTimeSlots(date, startTime, endTime, duration, existingAppointme
     const slotStart = current.clone();
     const slotEnd = current.clone().add(duration, 'minutes');
     
-    // Check if slot conflicts with existing appointments
     const isConflict = existingAppointments.some(appointment => {
       const appointmentStart = moment(appointment.startTime);
       const appointmentEnd = moment(appointment.endTime);

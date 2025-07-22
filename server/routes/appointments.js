@@ -9,7 +9,7 @@ const moment = require('moment');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Get all appointments (admin/business owner)
+//all appointments gets here (both admin or user)
 router.get('/', businessOwnerAuth, async (req, res) => {
   try {
     const { page = 1, limit = 10, status, date, serviceId } = req.query;
@@ -76,7 +76,7 @@ router.get('/', businessOwnerAuth, async (req, res) => {
   }
 });
 
-// Get user's appointments
+// Get user appointments
 router.get('/my-appointments', auth, async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
@@ -138,7 +138,7 @@ router.get('/my-appointments', auth, async (req, res) => {
   }
 });
 
-// Create appointment
+// Create appointment are here
 router.post('/', [
   auth,
   body('serviceId').notEmpty(),
@@ -155,7 +155,6 @@ router.post('/', [
 
     const { serviceId, providerId, date, startTime, notes } = req.body;
 
-    // Get service to calculate end time
     const service = await prisma.service.findUnique({
       where: { id: serviceId },
       include: {
@@ -175,7 +174,6 @@ router.post('/', [
     const startDateTime = new Date(startTime);
     const endDateTime = new Date(startDateTime.getTime() + service.duration * 60000);
 
-    // Check for overlapping appointments
     const overlapping = await prisma.appointment.findFirst({
       where: {
         providerId,
@@ -259,7 +257,6 @@ router.post('/', [
       console.error('Email sending failed:', emailError);
     }
 
-    // Emit socket event
     req.io.to(`user_${providerId}`).emit('appointment_booked', appointment);
 
     res.status(201).json({
@@ -317,7 +314,6 @@ router.get('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
-    // Check if user has access to this appointment
     if (appointment.userId !== req.user.userId && 
         appointment.providerId !== req.user.userId && 
         req.user.role !== 'ADMIN') {
@@ -378,7 +374,6 @@ router.put('/:id', [
     if (notes) updateData.notes = notes;
     if (cancelReason) updateData.cancelReason = cancelReason;
 
-    // If rescheduling, check for conflicts
     if (date || startTime) {
       const checkDate = date ? new Date(date) : appointment.date;
       const checkStartTime = startTime ? new Date(startTime) : appointment.startTime;
@@ -435,7 +430,6 @@ router.put('/:id', [
       }
     });
 
-    // Send notifications based on status change
     if (status) {
       let notificationType, title, message;
       
@@ -589,7 +583,7 @@ router.get('/availability/:providerId', async (req, res) => {
         });
       }
 
-      startTime.add(30, 'minutes'); // 30-minute intervals
+      startTime.add(30, 'minutes'); 
     }
 
     res.json({ availableSlots });

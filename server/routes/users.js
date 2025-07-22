@@ -8,7 +8,7 @@ const path = require('path');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Configure multer for profile image uploads
+// Config multer for profile image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/profiles/');
@@ -71,7 +71,7 @@ router.get('/profile', auth, async (req, res) => {
   }
 });
 
-// Update user profile
+// update user profile
 router.put('/profile', [
   auth,
   body('firstName').optional().notEmpty().trim(),

@@ -3,13 +3,13 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-// Basic authentication middleware
+// basic authentication middleware is here 
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
-      return res.status(401).json({ message: 'No token, authorization denied' });
+      return res.status(401).json({ message: 'no token, authorization denied' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -19,13 +19,13 @@ const auth = async (req, res, next) => {
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ message: 'Invalid token' });
     } else if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token expired' });
+      return res.status(401).json({ message: 'token expired' });
     }
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Admin authentication middleware
+// Admin authentication middleware here
 const adminAuth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -37,7 +37,7 @@ const adminAuth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
 
-    // Check if user is admin
+    
     if (req.user.role !== 'ADMIN') {
       return res.status(403).json({ message: 'Access denied. Admin required.' });
     }
@@ -65,7 +65,7 @@ const businessOwnerAuth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
 
-    // Check if user is business owner or admin
+    // Check karo user business owner hai ya  admin 
     if (req.user.role !== 'BUSINESS_OWNER' && req.user.role !== 'ADMIN') {
       return res.status(403).json({ message: 'Access denied. Business owner required.' });
     }
@@ -81,7 +81,7 @@ const businessOwnerAuth = async (req, res, next) => {
   }
 };
 
-// Optional authentication middleware (doesn't require token)
+// Optional authentication middleware (not require token)
 const optionalAuth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -93,7 +93,6 @@ const optionalAuth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    // Continue without authentication if token is invalid
     next();
   }
 };
